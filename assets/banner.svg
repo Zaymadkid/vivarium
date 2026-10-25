@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="380" viewBox="0 0 1280 380" role="img" aria-label="Vivarium — an open world for agents">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="0%" r="110%">
+      <stop offset="0%" stop-color="#0b1512"/>
+      <stop offset="55%" stop-color="#06090a"/>
+      <stop offset="100%" stop-color="#040607"/>
+    </radialGradient>
+    <radialGradient id="core" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#b9ffd9" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#35e29b" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#35e29b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2fff9"/>
+      <stop offset="100%" stop-color="#a9f5cf"/>
+    </linearGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="tight" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#35e29b" opacity="0.10"/>
+    </pattern>
+  </defs>
+
+  <rect width="1280" height="380" fill="url(#bg)"/>
+  <rect width="1280" height="380" fill="url(#grid)"/>
+
+  <!-- horizon -->
+  <path d="M0 296 C 220 258, 420 318, 640 292 S 1060 268, 1280 300 L1280 380 L0 380 Z"
+        fill="#0a1a15" opacity="0.9"/>
+  <path d="M0 296 C 220 258, 420 318, 640 292 S 1060 268, 1280 300"
+        fill="none" stroke="#35e29b" stroke-opacity="0.22" stroke-width="1.2"/>
+
+  <!-- orbital mark -->
+  <g transform="translate(640 168)">
+    <circle r="96" fill="#35e29b" opacity="0.10" filter="url(#soft)"/>
+    <circle r="42" fill="url(#core)"/>
+    <ellipse rx="86" ry="30" fill="none" stroke="#35e29b" stroke-opacity="0.45" stroke-width="1.4"
+             transform="rotate(-24)"/>
+    <ellipse rx="72" ry="26" fill="none" stroke="#8affc9" stroke-opacity="0.25" stroke-width="1"
+             transform="rotate(38)"/>
+    <circle cx="76" cy="-34" r="3.4" fill="#b9ffd9"/>
+    <circle cx="-66" cy="42" r="2.2" fill="#8affc9" opacity="0.8"/>
+    <circle r="6" fill="#eafff5" opacity="0.9" filter="url(#tight)"/>
+  </g>
+
+  <text x="640" y="316" text-anchor="middle"
+        font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+        font-size="46" letter-spacing="18" fill="url(#word)">VIVARIUM</text>
+  <text x="640" y="348" text-anchor="middle"
+        font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+        font-size="15" letter-spacing="6" fill="#7fd8b0" opacity="0.75">AN OPEN WORLD FOR AGENTS</text>
+</svg>

@@ -1,0 +1,341 @@
+/* The pointing layer. Transparent window, nothing focusable, nothing clickable. */
+
+html.guide-mode,
+html.guide-mode body,
+html.guide-mode #root {
+  background: transparent !important;
+  overflow: hidden;
+  margin: 0;
+  height: 100%;
+}
+
+.guide-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: var(--sans, "Inter", system-ui, sans-serif);
+  color: #f4f6fb;
+  user-select: none;
+}
+
+/* No target: a thin wash, so the words are readable but the screen still is too. */
+.guide-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 38%, rgba(4, 8, 14, 0.28), rgba(2, 5, 10, 0.62));
+}
+
+/* The target: an actual hole. The enormous shadow does the veiling. */
+.guide-hole {
+  position: absolute;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--accent, #35e29b) 84%, white);
+  box-shadow:
+    0 0 0 100vmax rgba(2, 5, 10, 0.58),
+    0 0 0 1px rgba(4, 8, 14, 0.7),
+    0 0 26px 4px color-mix(in srgb, var(--accent, #35e29b) 45%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent, #35e29b) 14%, transparent);
+  color: var(--accent, #35e29b);
+  animation: guide-in 180ms ease-out both;
+}
+
+.guide-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 74px;
+  height: 74px;
+  margin: -37px 0 0 -37px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent, #35e29b) 70%, transparent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent, #35e29b) 55%, transparent);
+  animation: guide-pulse 1.7s ease-out infinite;
+}
+
+.guide-beam {
+  position: absolute;
+  inset: -1px;
+  border-radius: 12px;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    color-mix(in srgb, var(--accent, #35e29b) 18%, transparent) 48%,
+    transparent 70%
+  );
+  animation: guide-sweep 2.8s ease-in-out infinite;
+}
+
+.guide-cursor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 36px;
+  transform: translate(-42%, -58%);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  animation: guide-nudge 1.8s ease-in-out infinite;
+}
+
+.guide-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 34px);
+  transform: translateX(-50%);
+  max-width: 240px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(6, 11, 19, 0.92);
+  border: 1px solid color-mix(in srgb, var(--accent, #35e29b) 45%, transparent);
+  color: #eaf7f1;
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guide-bubble {
+  position: absolute;
+  padding: 13px 15px 11px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(10, 16, 26, 0.97), rgba(6, 10, 18, 0.97));
+  border: 1px solid rgba(120, 200, 175, 0.26);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: guide-rise 200ms ease-out both;
+}
+
+.guide-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.guide-count {
+  flex: none;
+  font-family: var(--mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--accent, #35e29b);
+  background: color-mix(in srgb, var(--accent, #35e29b) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #35e29b) 28%, transparent);
+}
+
+.guide-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(226, 240, 235, 0.66);
+}
+
+.guide-text {
+  margin: 9px 0 0;
+  font-size: 14.5px;
+  line-height: 1.42;
+  color: #f2f7f5;
+}
+
+.guide-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 11px;
+}
+
+.guide-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.guide-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.guide-dots i.past {
+  background: color-mix(in srgb, var(--accent, #35e29b) 55%, transparent);
+}
+
+.guide-dots i.on {
+  background: var(--accent, #35e29b);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent, #35e29b) 70%, transparent);
+}
+
+.guide-keys {
+  font-family: var(--mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: rgba(210, 226, 222, 0.42);
+}
+
+.guide-goal {
+  display: block;
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 10.5px;
+  color: rgba(205, 226, 218, 0.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes guide-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent, #35e29b) 45%, transparent);
+    opacity: 0.9;
+  }
+  70% {
+    box-shadow: 0 0 0 18px transparent;
+    opacity: 0.35;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    opacity: 0.9;
+  }
+}
+
+@keyframes guide-sweep {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateX(-2%);
+  }
+  50% {
+    opacity: 0.75;
+    transform: translateX(2%);
+  }
+}
+
+@keyframes guide-nudge {
+  0%,
+  100% {
+    transform: translate(-42%, -58%);
+  }
+  50% {
+    transform: translate(-46%, -54%);
+  }
+}
+
+@keyframes guide-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes guide-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-hole,
+  .guide-bubble {
+    animation: none;
+  }
+  .guide-ring,
+  .guide-beam,
+  .guide-cursor {
+    animation: none;
+  }
+}
+
+/* A hand action: a pointer over the real desktop, nothing else. */
+.hand-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: var(--sans, "Inter", system-ui, sans-serif);
+}
+.hand-point {
+  position: absolute;
+  width: 0;
+  height: 0;
+  color: var(--accent, #35e29b);
+}
+.hand-ring {
+  position: absolute;
+  left: -34px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent, #35e29b) 80%, white);
+  box-shadow: 0 0 22px 4px color-mix(in srgb, var(--accent, #35e29b) 38%, transparent);
+  animation: hand-pulse 900ms ease-out infinite;
+}
+.hand-cursor {
+  position: absolute;
+  left: -9px;
+  top: -6px;
+  width: 30px;
+  height: 36px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65));
+  animation: hand-drift 900ms ease-out both;
+}
+.hand-label {
+  position: absolute;
+  left: 22px;
+  top: 26px;
+  max-width: 260px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(6, 11, 19, 0.94);
+  border: 1px solid color-mix(in srgb, var(--accent, #35e29b) 42%, transparent);
+  color: #eaf7f1;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@keyframes hand-pulse {
+  from {
+    transform: scale(0.55);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+@keyframes hand-drift {
+  from {
+    transform: translate(3px, 3px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hand-ring,
+  .hand-cursor {
+    animation: none;
+  }
+}

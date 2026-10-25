@@ -1,0 +1,31 @@
+# dependencies and build output
+node_modules/
+out/
+dist/
+release/
+*.log
+*.tsbuildinfo
+
+# local state never leaves the machine
+.env
+.env.*
+*.local
+.freebuff/
+
+# research material, not part of the product
+tools/
+screenshots/
+docs/ui/
+docs/REPORT.md
+docs/NUS-PORT.md
+docs/LICENSE-NOTES.md
+docs/FEATURES.md
+docs/UI-CATALOG.md
+docs/README.md
+*.exe
+
+# editors and OS cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

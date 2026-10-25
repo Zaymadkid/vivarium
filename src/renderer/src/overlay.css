@@ -1,0 +1,760 @@
+/* --------------------------------------------------------------- the Knot */
+
+/*
+ * This window is frameless and transparent: the page itself must not paint a
+ * background, or the rectangle around the orb becomes a black box on screen.
+ */
+html.overlay-mode,
+html.overlay-mode body,
+html.overlay-mode #root {
+  background: transparent !important;
+  overflow: hidden;
+}
+
+html.overlay-mode body {
+  margin: 0;
+  user-select: none;
+}
+
+.knot {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-1);
+  font-family: inherit;
+}
+
+/* ---- collapsed orb ------------------------------------------------------ */
+
+.knot-collapsed {
+  -webkit-app-region: drag;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+}
+
+.knot-grip {
+  display: grid;
+  grid-template-columns: repeat(2, 2px);
+  gap: 2px;
+  opacity: 0.32;
+}
+
+.knot-grip i {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--tx-2);
+}
+
+.knot-orb {
+  -webkit-app-region: no-drag;
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--companion) 42%, var(--line-2));
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--companion) 26%, transparent), transparent 58%),
+    radial-gradient(circle at 50% 60%, rgba(8, 10, 12, 0.98), rgba(5, 6, 8, 0.99));
+  color: color-mix(in srgb, var(--companion) 82%, white);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    inset 0 0 16px color-mix(in srgb, var(--companion) 12%, transparent);
+  cursor: pointer;
+  transition: transform 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.knot-orb:hover {
+  transform: translateY(-1px);
+  border-color: var(--companion);
+}
+
+.knot-orb:active {
+  transform: scale(0.97);
+}
+
+.knot-glyph {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.95;
+}
+
+.knot-glyph .knot-core {
+  fill: currentColor;
+  stroke: none;
+}
+
+.knot-dot {
+  position: absolute;
+  right: 7px;
+  bottom: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tx-3);
+  box-shadow: 0 0 0 2px rgba(5, 6, 8, 0.9);
+}
+
+.knot-dot.live {
+  background: #ff5c5c;
+  box-shadow: 0 0 0 2px rgba(5, 6, 8, 0.9), 0 0 10px #ff5c5c;
+}
+
+.knot-dot.busy {
+  background: var(--companion);
+  box-shadow: 0 0 0 2px rgba(5, 6, 8, 0.9), 0 0 10px var(--companion);
+  animation: knot-blink 1.1s infinite;
+}
+
+.knot-ring {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in srgb, var(--companion) 55%, transparent);
+  border-radius: 50%;
+  animation: knot-pulse 1.4s var(--ease) infinite;
+  pointer-events: none;
+}
+
+.knot-orb-meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 17px;
+}
+
+.knot-orb-meter i {
+  width: 2px;
+  border-radius: 2px;
+  background: var(--companion);
+  transition: height 90ms linear;
+}
+
+/* ---- expanded panel ----------------------------------------------------- */
+
+.knot-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 80% -10%, color-mix(in srgb, var(--companion) 9%, transparent), transparent 40%),
+    rgba(7, 9, 11, 0.975);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.7);
+}
+
+.knot-head {
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.knot-mark {
+  -webkit-app-region: no-drag;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--companion) 36%, var(--line));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--companion) 10%, var(--raise));
+  color: var(--companion);
+  cursor: pointer;
+}
+
+.knot-mark .knot-glyph {
+  width: 21px;
+  height: 21px;
+}
+
+.knot-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.knot-who strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 590;
+  letter-spacing: 0.01em;
+}
+
+.knot-who span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+}
+
+.knot-state {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tx-3);
+}
+
+.knot-state.live {
+  background: #ff5c5c;
+  box-shadow: 0 0 6px #ff5c5c;
+}
+
+.knot-state.busy {
+  background: var(--companion);
+  box-shadow: 0 0 6px var(--companion);
+  animation: knot-blink 1.1s infinite;
+}
+
+.knot-model {
+  flex: none;
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  color: var(--tx-3);
+  letter-spacing: 0.03em;
+}
+
+/* Live conversation: one small switch, because the whole point is not having
+   to reach for anything while you talk. */
+.knot-live {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tx-3);
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.knot-live i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tx-3);
+}
+
+.knot-live:hover {
+  border-color: var(--line-2);
+  color: var(--tx-1);
+}
+
+.knot-live.on {
+  border-color: color-mix(in srgb, var(--companion) 55%, var(--line));
+  background: color-mix(in srgb, var(--companion) 12%, transparent);
+  color: var(--companion);
+}
+
+.knot-live.on i {
+  background: var(--companion);
+  box-shadow: 0 0 6px var(--companion);
+  animation: knot-blink 1.4s infinite;
+}
+
+.knot-icon {
+  -webkit-app-region: no-drag;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  flex: none;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--tx-3);
+  cursor: pointer;
+}
+
+.knot-icon:hover {
+  border-color: var(--line);
+  background: var(--raise);
+  color: var(--tx-1);
+}
+
+/* ---- thread ------------------------------------------------------------- */
+
+.knot-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 11px;
+  scrollbar-width: thin;
+}
+
+.knot-bubble {
+  max-width: 88%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.knot-bubble.user {
+  align-self: flex-end;
+  border: 1px solid color-mix(in srgb, var(--companion) 34%, var(--line));
+  border-bottom-right-radius: 4px;
+  background: color-mix(in srgb, var(--companion) 15%, var(--raise));
+}
+
+.knot-bubble.assistant {
+  align-self: flex-start;
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 4px;
+  background: var(--raise);
+  color: var(--tx-1);
+}
+
+.knot-bubble.assistant.live {
+  border-color: color-mix(in srgb, var(--companion) 30%, var(--line));
+}
+
+.knot-bubble .caret {
+  display: inline-block;
+  width: 5px;
+  height: 10px;
+  margin-left: 2px;
+  vertical-align: -1px;
+  background: var(--companion);
+  animation: knot-blink 1s steps(2) infinite;
+}
+
+.knot-empty {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  max-width: 270px;
+  padding: 18px;
+  text-align: center;
+  color: var(--tx-3);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.knot-empty strong {
+  color: var(--tx-1);
+  font-size: 12px;
+  font-weight: 580;
+}
+
+.knot-hello .knot-glyph {
+  width: 46px;
+  height: 46px;
+  color: var(--companion);
+  opacity: 0.8;
+}
+
+.knot-activity,
+.knot-note,
+.knot-error {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--tx-3);
+}
+
+.knot-note {
+  color: color-mix(in srgb, var(--companion) 75%, var(--tx-2));
+}
+
+.knot-error {
+  color: color-mix(in srgb, #ff6b6b 82%, var(--tx-2));
+}
+
+.knot-activity .actdot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--companion);
+  animation: knot-blink 1.1s infinite;
+}
+
+.knot-approval {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, #ffb44d 38%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, #ffb44d 6%, var(--raise));
+}
+
+.knot-approval-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+}
+
+.knot-approval-head strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.knot-approval pre {
+  max-height: 74px;
+  margin: 0;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: var(--tx-2);
+  white-space: pre-wrap;
+}
+
+.knot-approval-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.knot-approval-actions button {
+  flex: 1;
+  height: 25px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--raise);
+  color: var(--tx-2);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.knot-approval-actions button:hover {
+  color: var(--tx-1);
+  border-color: var(--line-2);
+}
+
+.knot-approval-actions .primary {
+  border-color: color-mix(in srgb, var(--companion) 45%, var(--line));
+  color: var(--tx-1);
+}
+
+.knot-approval-actions .danger {
+  border-color: color-mix(in srgb, #ff4d4d 38%, var(--line));
+  color: color-mix(in srgb, #ff8a8a 85%, var(--tx-1));
+}
+
+/* ---- composer ----------------------------------------------------------- */
+
+.knot-compose {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+  padding: 9px 10px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.knot-compose textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  max-height: 92px;
+  padding: 9px 10px;
+  resize: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--raise);
+  color: var(--tx-1);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.35;
+  outline: none;
+}
+
+.knot-compose textarea:focus {
+  border-color: color-mix(in srgb, var(--companion) 40%, var(--line));
+}
+
+.knot-compose textarea::placeholder {
+  color: var(--tx-3);
+}
+
+.knot-mic {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--raise);
+  color: var(--tx-2);
+  cursor: pointer;
+}
+
+.knot-mic:hover {
+  color: var(--tx-1);
+  border-color: var(--line-2);
+}
+
+.knot-mic.listening {
+  border-color: color-mix(in srgb, #ff5c5c 55%, var(--line));
+  background: color-mix(in srgb, #ff5c5c 16%, var(--raise));
+  color: #ffb3b3;
+}
+
+.knot-mic.transcribing,
+.knot-mic.connecting {
+  color: var(--companion);
+  border-color: color-mix(in srgb, var(--companion) 45%, var(--line));
+  animation: knot-blink 1.2s infinite;
+}
+
+.knot-meter {
+  position: absolute;
+  inset: auto 0 -6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.knot-meter i {
+  width: 2px;
+  border-radius: 2px;
+  background: #ff7b7b;
+  transition: height 90ms linear;
+}
+
+.knot-send {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--companion) 45%, var(--line));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--companion) 18%, var(--raise));
+  color: var(--tx-1);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.knot-send:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.knot-send.stop {
+  border-color: color-mix(in srgb, #ff4d4d 45%, var(--line));
+  color: #ff9b9b;
+  font-size: 9px;
+}
+
+.knot-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: none;
+  padding: 6px 11px 8px;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  letter-spacing: 0.03em;
+  color: var(--tx-3);
+}
+
+.knot-foot b {
+  color: var(--tx-2);
+  font-weight: 500;
+}
+
+@keyframes knot-pulse {
+  0% { transform: scale(0.92); opacity: 0.7; }
+  70% { transform: scale(1.18); opacity: 0; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+@keyframes knot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ---- island mode: the Knot as a slim bar --------------------------------- */
+
+.knot.island-mode {
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+.island-bar {
+  -webkit-app-region: drag;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: calc(100vw - 8px);
+  height: 50px;
+  margin: 4px;
+  padding: 0 8px 0 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(16, 33, 26, 0.96), rgba(8, 19, 15, 0.97));
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(210, 255, 230, 0.07);
+  backdrop-filter: blur(20px) saturate(1.15);
+}
+
+.island-bar.listening {
+  border-color: color-mix(in srgb, var(--companion) 55%, var(--line));
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.55),
+    0 0 30px color-mix(in srgb, var(--companion) 16%, transparent);
+}
+
+.island-mark {
+  -webkit-app-region: no-drag;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  border: 1px solid color-mix(in srgb, var(--companion) 32%, transparent);
+  background: color-mix(in srgb, var(--companion) 9%, transparent);
+  color: color-mix(in srgb, var(--companion) 82%, white);
+}
+.island-mark .knot-glyph { width: 26px; height: 26px; }
+.island-mark .knot-dot { position: absolute; right: 2px; top: 2px; }
+
+.island-who {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 72px;
+  max-width: 110px;
+  flex: 0 0 auto;
+}
+.island-who strong {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.island-who span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  color: var(--tx-3);
+  white-space: nowrap;
+}
+
+.island-bar input {
+  -webkit-app-region: no-drag;
+  flex: 1;
+  min-width: 80px;
+  height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--tx-1);
+  font-size: 12px;
+}
+.island-bar input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+}
+.island-bar input::placeholder { color: var(--tx-3); }
+
+.island-icon {
+  -webkit-app-region: no-drag;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--tx-2);
+  font-size: 12px;
+}
+.island-icon:hover { background: var(--raise); color: var(--tx-1); }
+.island-icon.mic.listening { color: var(--companion); background: color-mix(in srgb, var(--companion) 13%, transparent); }
+.island-icon.send { color: var(--accent); }
+.island-icon.send:disabled { opacity: 0.3; }
+.island-icon.stop { color: var(--bad); }
+
+.island-approvals {
+  position: absolute;
+  right: 6px;
+  top: -6px;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--warm);
+  color: #231a0b;
+  font-size: 9.5px;
+  font-weight: 700;
+}

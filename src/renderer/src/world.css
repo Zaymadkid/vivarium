@@ -1,0 +1,361 @@
+/*
+ * World paint + the CSS half of the motion system.
+ *
+ * Two jobs live here:
+ *   1. the no-WebGL / reduced-motion fallback for the stage (static sea + orb);
+ *   2. reusable motion classes (`m-*`) and their keyframes, mirroring the table in
+ *      `docs/ui/MOTION.md`. Chrome applies the `m-*` class it needs; the world
+ *      never restyles another agent's components.
+ *
+ * Every animation is disabled under `[data-motion="reduced"]`, which follows the
+ * in-app Motion setting. The OS preference only slows the canvas clock; see
+ * `world/motion.ts` for why it no longer stops the world dead.
+ */
+
+/* ---------------------------------------------------------------- fallback -- */
+
+.world--fallback {
+  background:
+    radial-gradient(60% 42% at 62% 18%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    radial-gradient(50% 50% at 22% 55%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%),
+    #050506;
+  overflow: hidden;
+}
+
+.world-static-sea {
+  position: absolute;
+  inset: 42% 0 0 0;
+  background:
+    radial-gradient(80% 30% at 50% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%),
+    repeating-linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warm) 6%, transparent) 0 1px,
+      transparent 1px 7px
+    );
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
+  opacity: 0.72;
+  animation: sea-swell 9s ease-in-out infinite alternate;
+}
+
+.world-static-orb {
+  position: absolute;
+  left: 50%;
+  top: 39%;
+  width: 180px;
+  height: 180px;
+  translate: -50% -50%;
+  /* WORLD.md §2.3: radial falloff at 0.95 / 0.70 / 0.32 / 0.08, transparent at 71 %. */
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      color-mix(in srgb, var(--accent) 95%, white) 0%,
+      color-mix(in srgb, var(--accent) 70%, transparent) 22%,
+      color-mix(in srgb, var(--accent) 32%, transparent) 48%,
+      color-mix(in srgb, var(--accent) 8%, transparent) 66%,
+      transparent 71%
+    );
+  box-shadow:
+    0 0 63px color-mix(in srgb, var(--accent) 28%, transparent),
+    0 0 144px color-mix(in srgb, var(--accent) 12%, transparent);
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+
+.world-orb-core {
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.16), transparent 62%);
+}
+
+.world-orb-ring {
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 70%, white), transparent);
+  opacity: 0.5;
+  animation: dot-breathe 25s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------------- motion -- */
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(0.97);
+    opacity: 0.88;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes sea-swell {
+  from {
+    transform: translateY(0) scaleY(1);
+  }
+  to {
+    transform: translateY(-6px) scaleY(1.02);
+  }
+}
+
+/* 25 s drift of the band / dot field. */
+@keyframes dot-breathe {
+  0%,
+  100% {
+    opacity: 0.32;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.62;
+    transform: translateY(-2px);
+  }
+}
+
+/* 2 s running indicator. */
+@keyframes running-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+
+/* 1.3 s typing cycle; three dots, 120 ms apart. */
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pill-glow {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+  to {
+    box-shadow: 0 0 18px 0 color-mix(in srgb, var(--accent) 32%, transparent);
+  }
+}
+
+@keyframes title-fade {
+  from {
+    opacity: 0;
+    letter-spacing: 0.6em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.52em;
+  }
+}
+
+@keyframes approval-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  70% {
+    transform: translateY(-1px) scale(1.002);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menu-open {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dissolve-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+/* Classes the chrome can apply. One class = one documented animation. */
+.m-drawer {
+  animation: drawer-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.m-palette {
+  animation: palette-in 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.m-pill {
+  animation: pill-glow 200ms ease-out both;
+}
+
+.m-title {
+  animation: title-fade 320ms ease-out both;
+}
+
+.m-running {
+  animation: running-pulse 2s ease-in-out infinite;
+}
+
+.m-approval {
+  animation: approval-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.m-toast {
+  animation: toast-in 180ms ease-out both;
+}
+
+.m-toast-out {
+  animation: toast-out 160ms ease-in both;
+}
+
+.m-bubble {
+  animation: bubble-in 180ms ease-out both;
+}
+
+.m-menu {
+  animation: menu-open 140ms ease-out both;
+}
+
+.m-dissolve {
+  animation: dissolve-out 420ms ease-in both;
+}
+
+.m-typing {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.m-typing > i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: typing-dot 1.3s ease-in-out infinite;
+}
+
+.m-typing > i:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.m-typing > i:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+/* Hover and focus are the two transitions every control shares. */
+.m-hover {
+  transition:
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.m-focus:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- reduced -- */
+
+[data-motion="reduced"] .world-static-sea,
+[data-motion="reduced"] .world-static-orb,
+[data-motion="reduced"] .world-orb-ring,
+[data-motion="reduced"] .m-drawer,
+[data-motion="reduced"] .m-palette,
+[data-motion="reduced"] .m-pill,
+[data-motion="reduced"] .m-title,
+[data-motion="reduced"] .m-approval,
+[data-motion="reduced"] .m-toast,
+[data-motion="reduced"] .m-toast-out,
+[data-motion="reduced"] .m-bubble,
+[data-motion="reduced"] .m-menu,
+[data-motion="reduced"] .m-dissolve,
+[data-motion="reduced"] .m-running {
+  animation: none;
+}
+
+[data-motion="reduced"] .m-hover {
+  transition: none;
+}
+
+[data-motion="reduced"] .m-typing > i {
+  animation: none;
+  opacity: 0.6;
+}
